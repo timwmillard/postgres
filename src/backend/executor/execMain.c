@@ -129,6 +129,11 @@ static void EvalPlanQualStart(EPQState *epqstate, Plan *planTree);
 void
 ExecutorStart(QueryDesc *queryDesc, int eflags)
 {
+
+	if (queryDesc->operation == CMD_SELECT) {
+		elog(LOG, "FIND command. Are you sure that's part of the SQL standard???");
+	}
+
 	/*
 	 * In some cases (e.g. an EXECUTE statement) a query execution will skip
 	 * parse analysis, which means that the query_id won't be reported.  Note

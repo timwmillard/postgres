@@ -703,7 +703,7 @@ static Node *makeRecursiveViewSelect(char *relname, List *aliases, Node *query);
 	RESET RESTART RESTRICT RETURN RETURNING RETURNS REVOKE RIGHT ROLE ROLLBACK ROLLUP
 	ROUTINE ROUTINES ROW ROWS RULE
 
-	SAVEPOINT SCHEMA SCHEMAS SCROLL SEARCH SECOND_P SECURITY SELECT SEQUENCE SEQUENCES
+	SAVEPOINT SCHEMA SCHEMAS SCROLL SEARCH SECOND_P SECURITY FIND SEQUENCE SEQUENCES
 	SERIALIZABLE SERVER SESSION SESSION_USER SET SETS SETOF SHARE SHOW
 	SIMILAR SIMPLE SKIP SMALLINT SNAPSHOT SOME SQL_P STABLE STANDALONE_P
 	START STATEMENT STATISTICS STDIN STDOUT STORAGE STORED STRICT_P STRIP_P
@@ -5309,7 +5309,7 @@ RowSecurityDefaultForCmd:
 
 row_security_cmd:
 			ALL				{ $$ = "all"; }
-		|	SELECT			{ $$ = "select"; }
+		|	FIND			{ $$ = "find"; }
 		|	INSERT			{ $$ = "insert"; }
 		|	UPDATE			{ $$ = "update"; }
 		|	DELETE_P		{ $$ = "delete"; }
@@ -6940,7 +6940,7 @@ privilege_list:	privilege							{ $$ = list_make1($1); }
 			| privilege_list ',' privilege			{ $$ = lappend($1, $3); }
 		;
 
-privilege:	SELECT opt_column_list
+privilege:	FIND opt_column_list
 			{
 				AccessPriv *n = makeNode(AccessPriv);
 				n->priv_name = pstrdup($1);
@@ -9857,7 +9857,7 @@ RuleActionStmtOrEmpty:
 			|	/*EMPTY*/							{ $$ = NULL; }
 		;
 
-event:		SELECT									{ $$ = CMD_SELECT; }
+event:		FIND									{ $$ = CMD_SELECT; }
 			| UPDATE								{ $$ = CMD_UPDATE; }
 			| DELETE_P								{ $$ = CMD_DELETE; }
 			| INSERT								{ $$ = CMD_INSERT; }
@@ -11439,7 +11439,7 @@ select_clause:
  * However, this is not checked by the grammar; parse analysis must check it.
  */
 simple_select:
-			SELECT opt_all_clause opt_target_list
+			FIND opt_all_clause opt_target_list
 			into_clause from_clause where_clause
 			group_clause having_clause window_clause
 				{
@@ -11454,7 +11454,7 @@ simple_select:
 					n->windowClause = $9;
 					$$ = (Node *)n;
 				}
-			| SELECT distinct_clause target_list
+			| FIND distinct_clause target_list
 			into_clause from_clause where_clause
 			group_clause having_clause window_clause
 				{
@@ -15917,6 +15917,7 @@ reserved_keyword:
 			| EXCEPT
 			| FALSE_P
 			| FETCH
+			| FIND
 			| FOR
 			| FOREIGN
 			| FROM
@@ -15943,7 +15944,6 @@ reserved_keyword:
 			| PRIMARY
 			| REFERENCES
 			| RETURNING
-			| SELECT
 			| SESSION_USER
 			| SOME
 			| SYMMETRIC
@@ -16108,6 +16108,7 @@ bare_label_keyword:
 			| FALSE_P
 			| FAMILY
 			| FINALIZE
+		    | FIND
 			| FIRST_P
 			| FLOAT_P
 			| FOLLOWING
@@ -16288,7 +16289,6 @@ bare_label_keyword:
 			| SCROLL
 			| SEARCH
 			| SECURITY
-			| SELECT
 			| SEQUENCE
 			| SEQUENCES
 			| SERIALIZABLE
